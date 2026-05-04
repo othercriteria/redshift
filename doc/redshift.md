@@ -14,55 +14,20 @@ header-includes:
 
 ## TL;DR
 
-Two physically distinct effects redshift light from distant galaxies:
-the galaxy's own motion through space (Doppler), and the expansion of
-space itself (cosmological). For a single galaxy, an observation
-cannot tell them apart. With many galaxies *and* an independent
-distance estimate per galaxy, a hierarchical Bayesian fit recovers
-both effects jointly. We demonstrate this on synthetic data, ablate
-the model down to its leanest viable form, find one tempting
+Two physically distinct mechanisms can redshift light from a distant
+galaxy: the galaxy's own motion through space (Doppler) and the
+expansion of space itself (cosmological). For a single galaxy, an
+observation cannot tell them apart. With many galaxies *and* an
+independent distance estimate per galaxy, a hierarchical Bayesian fit
+recovers both effects jointly. We demonstrate this on synthetic data,
+ablate the model down to its leanest viable form, find one tempting
 simplification that quietly biases $H_0$ by 4%, and end with the case
-where the distance proxy is removed — to see what the underlying
-degeneracy actually looks like.
-
-## How this document was made
-
-This document and its accompanying code were produced collaboratively
-by Daniel Klein and Claude Opus 4.7 (Anthropic's coding model),
-working together via the Claude Code CLI over several conversational
-sessions. The division of labor:
-
-- **Human author**: project framing and scope, methodology
-  ("complete-then-ablate"), tooling decisions (Stan + Python +
-  Pandoc), prioritization and redirection, visual review of every
-  figure, sign-off on substantive interpretation.
-- **Language model**: astronomical domain knowledge, drafting of all
-  code (generative model, Stan models, fitting and figure scripts),
-  drafting of this prose, mathematical derivations (e.g. the redshift
-  Jacobian), MCMC reparameterization attempts and their explanation.
-
-The git history is a faithful record of the collaboration: every
-commit lists Claude as co-author, and the conversational decisions
-that produced each commit are reflected in the commit messages. A
-verbatim transcript of every chat turn — including tool calls and
-their outputs — is checked in at `doc/transcript.md`, with content
-fetched from third parties (Stan documentation, blog excerpts)
-redacted out of copyright caution but URLs preserved so any reader
-can re-fetch. Substantive errors, scope decisions, and the framing
-of the identifiability claim itself are the human author's
-responsibility; implementation details and astronomical context are
-where the model contributed most.
-
-We flag this prominently because the work is recognizably the kind of
-short scientific writeup that, until recently, would have taken a
-domain expert several days. With current models it took a non-expert
-human roughly a working day spread across several sessions, with the
-human's main labor being decisions about what to investigate and what
-to trust. Readers should weigh the result accordingly.
+where the distance proxy is removed — so the underlying degeneracy
+becomes visible.
 
 ## 1 The question
 
-A spectral line emitted at wavelength $\lambda_0$ and received at
+A spectral line emitted at wavelength $\lambda_0$ and observed at
 wavelength $\lambda$ has redshift $z = (\lambda - \lambda_0)/\lambda_0$.
 Two physical mechanisms can make $z > 0$:
 
@@ -70,12 +35,22 @@ Two physical mechanisms can make $z > 0$:
   velocity $v$. For non-relativistic motion, the redshift contribution
   is $z_\text{pec} \approx v/c$.
 - **Cosmological.** The metric of space itself expanded between
-  emission and observation. At low redshift,
+  emission and observation, stretching the wavelength of the photon
+  while it was in flight. At low redshift,
   $z_\text{cos} \approx H_0 \, d / c$, where $d$ is the proper distance
   to the galaxy and $H_0$ is the Hubble constant.
 
-Both stretch wavelengths uniformly, so the spectroscopic signature is
-identical. Combining them properly gives the multiplicative form
+Both effects multiply every wavelength by the same factor: line
+*ratios*, the *pattern* of absorption and emission features, and the
+overall *shape* of a spectrum are preserved — only the absolute
+wavelength scale shifts. A spectrum recorded today and the same
+spectrum redshifted by either mechanism are translations of each
+other in $\log\lambda$. There is no purely spectroscopic feature that
+distinguishes "the galaxy moved" from "the universe expanded".
+
+Composition is also multiplicative: each effect scales wavelength by
+a factor, one applied at the source and the other accumulated during
+propagation, so the total stretch is the product of the two,
 
 $$
 1 + z_\text{obs} \;=\; (1 + z_\text{cos})\,(1 + z_\text{pec}).
@@ -220,6 +195,36 @@ hierarchical funnel between $\sigma_v$ and the latent $\{d_i\}$.
 Discussed further in Appendix A. Posterior coverage of truth is
 correct.
 
+### How many galaxies?
+
+$N = 500$ is the working size everywhere else in this document; it
+matches the rough order of magnitude of present-day low-redshift
+Type Ia supernova samples (Carnegie Supernova Project ~300 in
+total, Pantheon+ a few hundred at $z < 0.1$). To check how much that
+choice matters, we re-fit the complete model at $N \in \{50, 200,
+500, 2000\}$ on catalogs drawn from the same generative settings:
+
+| $N$ | $H_0$ 90% CI | $\sigma_v$ 90% CI | $\sigma_\text{obs}$ 90% CI |
+|---|---|---|---|
+| 50  | [69.5, 70.8] | [86, 737]  | [0.063, 0.124] |
+| 200 | [69.4, 70.2] | [250, 600] | [0.094, 0.125] |
+| 500 | [69.8, 70.3] | [231, 450] | [0.105, 0.122] |
+| 2000| [69.9, 70.1] | [242, 330] | [0.109, 0.116] |
+
+CI widths shrink as $1/\sqrt{N}$, as expected for a population
+parameter. At $N = 50$ the inference on $\sigma_v$ is essentially
+"there are peculiar velocities, somewhere between roughly 100 and 700
+km/s" — hardly a measurement. At $N = 200$ it's a real but loose
+constraint with a high-side bias. At $N = 500$, $\sigma_v$ is
+adequately pinned and centered on truth; this is the working sweet
+spot for a pedagogical demonstration. At $N = 2000$, $\sigma_v$ is
+*precise* (±27 km/s, ~10%), and approaching what next-generation
+surveys (Rubin / LSST, Roman) will deliver. The substantive
+identifiability claim — "many galaxies plus a distance proxy
+disentangle the two redshifts" — is robust across all four $N$, but
+how informative the recovered $\sigma_v$ is depends sharply on how
+many galaxies you actually have.
+
 ## 5 Ablation chain
 
 Methodology: build the model rich, then simplify one knob at a time.
@@ -256,6 +261,16 @@ The three safe configurations sit on top of each other on $H_0$,
 peaked at the truth. On $\sigma_v$, fixing $\sigma_\text{obs}$ shifts
 the marginal a little to higher values, as just discussed. The orange
 no-$\mu$ curve is the punchline of Section 7.
+
+**The minimum we land on**, then, is: redshift combined *additively*,
+the $q_0$ correction *retained* (Section 6 explains why), and
+$\sigma_\text{obs}$ treated as a *known constant* calibrated
+externally. Two free population parameters ($H_0$ and $\sigma_v$),
+one known nuisance ($\sigma_\text{obs}$), and $N$ latent per-galaxy
+distances. This is the working configuration for everything that
+follows; real cosmology fits add Malmquist correction, candle
+calibration uncertainty, and peculiar-velocity correlations on top of
+this skeleton, but the structure is the same.
 
 ## 6 Counter-example: the $q_0$ pitfall
 
@@ -482,3 +497,39 @@ use seed 1 and $N = 500$. The full toolchain (Python 3.14, CmdStan,
 Pandoc, TeXLive) is pinned via `flake.nix`; entering the development
 environment via `direnv allow` (or `nix develop`) gives a
 deterministic shell.
+
+## Appendix D — How this document was made
+
+This document and its accompanying code were produced collaboratively
+by Daniel Klein and Claude Opus 4.7 (Anthropic's coding model),
+working together via the Claude Code CLI over several conversational
+sessions. We flag this prominently because the work is recognizably
+the kind of short scientific writeup that, until recently, would have
+taken a domain expert several days. With current models it took a
+non-expert human roughly a working day spread across several
+sessions, with the human's main labor being decisions about *what to
+investigate* and *what to trust*. Readers should weigh the result
+accordingly.
+
+Division of labor:
+
+- **Human author**: project framing and scope, methodology
+  ("complete-then-ablate"), tooling decisions (Stan + Python +
+  Pandoc), prioritization and redirection, visual review of every
+  figure, sign-off on substantive interpretation.
+- **Language model**: astronomical domain knowledge, drafting of all
+  code (generative model, Stan models, fitting and figure scripts),
+  drafting of this prose, mathematical derivations (e.g. the redshift
+  Jacobian), MCMC reparameterization attempts and their explanation.
+
+The git history is a faithful record of the collaboration: every
+commit lists Claude as co-author, and the conversational decisions
+that produced each commit are reflected in the commit messages. A
+verbatim transcript of every chat turn — including tool calls and
+their outputs — is checked in at `doc/transcript.md`, with content
+fetched from third-party sites (Stan documentation, blog excerpts)
+redacted out of copyright caution but URLs preserved so any reader
+can re-fetch. Substantive errors, scope decisions, and the framing
+of the identifiability claim itself are the human author's
+responsibility; implementation details and astronomical context are
+where the model contributed most.

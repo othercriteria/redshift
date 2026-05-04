@@ -3059,3 +3059,959 @@ Sweep is clean — no extraneous emails, IPs, secrets, or non-`/home/dlk` paths.
 > *tool result*
 >
 > The file /home/dlk/workspace/redshift/scripts/extract_transcript.py has been updated successfully.
+
+**→ Bash:** `python scripts/extract_transcript.py --session /home/dlk/.claude/projects/-home-dlk-workspace-redshift/a25ea3db-509d-4c85-9e79-cf2646391f97.jsonl 2>&1 | tail -2 && echo "---" && grep -cE "\\\\x1b|\[38;2" doc/transcript.md`
+
+> *tool result*
+>
+> wrote doc/transcript.md (119942 bytes)
+> ---
+> 0
+
+*[thinking block — content not retained in session log]*
+
+ANSI is stripped, transcript is 120 KB. Now adding a pointer in the deliverable and rendering.
+
+**→ Edit:** `/home/dlk/workspace/redshift/doc/redshift.md`
+
+> *tool result*
+>
+> The file /home/dlk/workspace/redshift/doc/redshift.md has been updated successfully.
+
+**→ TaskUpdate:** id=24 → completed
+
+> *tool result*
+>
+> Updated task #24 status
+
+**→ TaskUpdate:** id=25 → completed
+
+> *tool result*
+>
+> Updated task #25 status
+
+**→ TaskUpdate:** id=21 → completed
+
+> *tool result*
+>
+> Updated task #21 status
+
+**→ TaskUpdate:** id=22 → in_progress
+
+> *tool result*
+>
+> Updated task #22 status
+
+**→ Bash:** `just pdf 2>&1 | tail -10 && ls -la doc/redshift.pdf`
+
+> *tool result*
+>
+> Exit code 2
+> ! LaTeX Error: Unicode character σ (U+03C3)
+>                not set up for use with LaTeX.
+>
+> See the LaTeX manual or LaTeX Companion for explanation.
+> Type  H <return>  for immediate help.
+>  ...                                              
+>                                                   
+> l.676 \end{verbatim}
+>
+> error: Recipe `pdf` failed on line 18 with exit code 43
+> ls: cannot access 'doc/redshift.pdf': No such file or directory
+
+*[thinking block — content not retained in session log]*
+
+pdflatex can't handle σ in verbatim blocks. Switch pandoc to xelatex.
+
+**→ Edit:** `/home/dlk/workspace/redshift/justfile`
+
+> *tool result*
+>
+> The file /home/dlk/workspace/redshift/justfile has been updated successfully.
+
+**→ Bash:** `just pdf 2>&1 | tail -8 && ls -la doc/redshift.pdf 2>&1`
+
+> *tool result*
+>
+> [WARNING] Could not fetch resource figures/complete/hubble.png: replacing image with description
+> [WARNING] Could not fetch resource figures/complete/posterior.png: replacing image with description
+> [WARNING] Could not fetch resource figures/compare/marginals_safe.png: replacing image with description
+> [WARNING] Could not fetch resource figures/compare/marginals_counter.png: replacing image with description
+> [WARNING] Could not fetch resource figures/compare/joint_safe_vs_no_mu.png: replacing image with description
+> [WARNING] Missing character: There is no σ (U+03C3) (U+03C3) in font [lmmono10-regular]:!
+> [WARNING] Missing character: There is no σ (U+03C3) (U+03C3) in font [lmmono10-regular]:!
+> [WARNING] Missing character: There is no μ (U+03BC) (U+03BC) in font [lmmono10-regular]:!
+> -rw-r--r-- 1 dlk users 87593 May  4 15:30 doc/redshift.pdf
+
+*[thinking block — content not retained in session log]*
+
+Two cleanups: figures need `--resource-path=doc`, and xelatex needs a monofont with Greek glyphs.
+
+**→ Edit:** `/home/dlk/workspace/redshift/justfile`
+
+> *tool result*
+>
+> The file /home/dlk/workspace/redshift/justfile has been updated successfully.
+
+**→ Edit:** `/home/dlk/workspace/redshift/doc/redshift.md`
+
+> *tool result*
+>
+> The file /home/dlk/workspace/redshift/doc/redshift.md has been updated successfully.
+
+**→ Bash:** `just pdf 2>&1 | tail -10 && ls -la doc/redshift.pdf`
+
+> *tool result*
+>
+> pandoc doc/redshift.md -o doc/redshift.pdf --pdf-engine=xelatex --resource-path=doc
+> -rw-r--r-- 1 dlk users 826008 May  4 15:31 doc/redshift.pdf
+
+*[thinking block — content not retained in session log]*
+
+Clean. Let me eyeball it.
+
+**→ Read:** `/home/dlk/workspace/redshift/doc/redshift.pdf`
+
+> *tool result*
+>
+> pdftoppm is not installed. Install poppler-utils (e.g. `brew install poppler` or `apt-get install poppler-utils`) to enable PDF page rendering.
+
+*[thinking block — content not retained in session log]*
+
+Adding a justfile recipe for the transcript regeneration so the final pass is one command.
+
+**→ Edit:** `/home/dlk/workspace/redshift/justfile`
+
+> *tool result*
+>
+> The file /home/dlk/workspace/redshift/justfile has been updated successfully.
+
+**→ Bash:** `git status && echo "---" && git diff --stat`
+
+> *tool result*
+>
+> On branch main
+> Changes not staged for commit:
+>   (use "git add/rm <file>..." to update what will be committed)
+>   (use "git restore <file>..." to discard changes in working directory)
+> 	deleted:    doc/.gitkeep
+> 	modified:   justfile
+>
+> Untracked files:
+>   (use "git add <file>..." to include in what will be committed)
+> 	doc/redshift.md
+> 	doc/redshift.pdf
+> 	doc/transcript.md
+> 	scripts/
+>
+> no changes added to commit (use "git add" and/or "git commit -a")
+> ---
+>  doc/.gitkeep |  0
+>  justfile     | 21 +++++++++++++++++++--
+>  2 files changed, 19 insertions(+), 2 deletions(-)
+
+**→ Bash:** `git add -A && git lfs ls-files | head -10`
+
+> *tool result*
+>
+> e2776d3890 * doc/redshift.pdf
+> 80861b1052 * doc/figures/compare/joint_safe_vs_no_mu.png
+> aaf5c62085 * doc/figures/compare/marginals_counter.png
+> ddec77d297 * doc/figures/compare/marginals_safe.png
+> f92951c108 * doc/figures/complete/hubble.png
+> b83b6cc927 * doc/figures/complete/posterior.png
+
+**→ Bash:** `git commit -m "$(cat <<'EOF'`
+
+> *tool result*
+>
+> [main 80f5e34] Deliverable: doc/redshift.md, rendered PDF, session transcript
+>  6 files changed, 3799 insertions(+), 2 deletions(-)
+>  delete mode 100644 doc/.gitkeep
+>  create mode 100644 doc/redshift.md
+>  create mode 100644 doc/redshift.pdf
+>  create mode 100644 doc/transcript.md
+>  create mode 100644 scripts/extract_transcript.py
+> 80f5e34 Deliverable: doc/redshift.md, rendered PDF, session transcript
+> d6b364e Ablation rig: four sibling models + cross-model comparison figures
+> 32564c3 Set up Git LFS for figures and the deliverable PDF
+> 5838b0a Diagnostic figures (Hubble + corner plot), fit-output cleanup
+> b98f165 Generative process, complete Stan model, fit script
+> 98499f1 Bump to Python 3.14, drop arviz from package set
+> 1a6b3e5 Bootstrap: Nix flake, direnv, justfile, project skeleton
+
+**→ TaskUpdate:** id=22 → completed
+
+> *tool result*
+>
+> Updated task #22 status
+
+Landed as `80f5e34`. Status:
+
+- **`doc/redshift.md`** — the narrative deliverable, ~10 sections + 3 appendices, math via LaTeX, figures embedded.
+- **`doc/redshift.pdf`** — rendered via xelatex (LFS-tracked, 826 KB). Pandoc warnings all resolved (DejaVu Sans Mono for unicode glyphs, `--resource-path=doc` for figure refs).
+- **`doc/transcript.md`** — 120 KB readable trace of the session. WebSearch/WebFetch results redacted with a copyright-caution notice; URLs preserved. Thinking blocks come through as placeholders since the session log only stores their signatures, not text. ANSI escapes stripped.
+- **`scripts/extract_transcript.py`** + **`just transcript`** — re-extractable for the final pass.
+
+Authorship section now in `doc/redshift.md` with explicit division of labor and pointer to the transcript. Sweep for sensitive info turned up only `othercriteria@gmail.com`, which is your already-public commit address.
+
+PDF I can't view directly without poppler — the visual review is yours. Other thing worth noting: I redacted thinking content because the JSONL only stored empty placeholders, but if you'd ever like real reasoning to be captured for transcripts, that'd require a different ingestion path.
+
+---
+
+## User
+
+I see the figures in the PDF, and am reviewing.
+
+I think we're good to expose this as a public repo ("redshift" for brevity) on my GH.
+
+---
+
+## Claude
+
+*[thinking block — content not retained in session log]*
+
+Let me check the README's landing message first (it's what visitors will see), then check `gh` auth, then create and push.
+
+**→ Bash:** `gh auth status 2>&1 | head -10 && echo "---README---" && cat README.md`
+
+> *tool result*
+>
+> (eval):1: command not found: gh
+> ---README---
+> # redshift
+>
+> Toy mathematical model exploring whether — and how — Doppler redshift
+> (peculiar motion) can be statistically separated from cosmological
+> redshift (metric expansion).
+>
+> ## Story
+>
+> A single observed redshift `z_obs` mixes two physically distinct
+> contributions:
+>
+> - a **cosmological** piece, deterministic in distance: `z_cos ≈ H₀ d / c`
+> - a **Doppler** piece, drawn from a peculiar-velocity distribution: `z_dop ≈ v / c`
+>
+> Per object, these are perfectly degenerate. With an *independent
+> distance proxy* (a standard candle) and many objects, the regression
+> structure separates them: the slope of `z̄(d)` constrains `H₀`, the
+> scatter constrains `σ_v`.
+>
+> This repo builds a small generative model in that low-redshift linear
+> regime, fits it with Stan, and ablates incrementally toward the
+> minimum that still makes the identifiability argument.
+>
+> The deliverable is a Pandoc-built PDF, not a notebook. Interactive
+> parameter twiddling is intentionally low-priority.
+>
+> ## Dev environment
+>
+> Enter the flake shell:
+>
+> ```bash
+> nix develop
+> ```
+>
+> Or, with `direnv`:
+>
+> ```bash
+> direnv allow
+> ```
+>
+> Then list available recipes:
+>
+> ```bash
+> just
+> ```
+>
+> ## Layout
+>
+> ```
+> flake.nix          Nix-managed toolchain (Python, CmdStan, Pandoc, TeX, just)
+> justfile           Orchestration: generate → fit → figures → pandoc
+> src/               Python + Stan source
+> doc/               Markdown narrative + bibliography
+> build/             Generated figures, draws, and final PDF (gitignored)
+> ```
+
+*[thinking block — content not retained in session log]*
+
+`gh` isn't installed yet. Let me check how their other repos auth to GitHub to figure out the cleanest path.
+
+**→ Bash:** `git -C ~/workspace/nixos-config remote -v 2>&1 | head -3 && echo "---" && cat ~/.gitconfig 2>&1 | head -20 && echo "---ssh-keys---" && ls ~/.ssh/ 2>&1 | head`
+
+> *tool result*
+>
+> origin	git@github.com:othercriteria/nixos-config.git (fetch)
+> origin	git@github.com:othercriteria/nixos-config.git (push)
+> ---
+> cat: /home/dlk/.gitconfig: No such file or directory
+> ---ssh-keys---
+> authorized_keys
+> config
+> hive
+> hive.pub
+> id_ed25519
+> id_ed25519_github
+> id_ed25519_github.pub
+> id_ed25519.pub
+> known_hosts
+> known_hosts.old
+
+*[thinking block — content not retained in session log]*
+
+GitHub username `othercriteria`, SSH already set up. Let me add `gh` to the flake (so it's persistent) and check if there's a token in env or if they need to do `gh auth login`.
+
+**→ Bash:** `echo "GH_TOKEN set: ${GH_TOKEN:+yes}${GH_TOKEN:-no}" && echo "GITHUB_TOKEN set: ${GITHUB_TOKEN:+yes}${GITHUB_TOKEN:-no}" && nix run nixpkgs#gh -- --version 2>&1 | head -3`
+
+> *tool result*
+>
+> GH_TOKEN set: no
+> GITHUB_TOKEN set: no
+> gh version 2.90.0 (nixpkgs)
+> https://github.com/cli/cli/releases/tag/v2.90.0
+
+*[thinking block — content not retained in session log]*
+
+**→ Bash:** `ls ~/.config/gh/ 2>/dev/null && nix run nixpkgs#gh -- auth status 2>&1 | head -5`
+
+> *tool result*
+>
+> config.yml
+> hosts.yml
+> github.com
+>   ✓ Logged in to github.com account othercriteria (/home/dlk/.config/gh/hosts.yml)
+>   - Active account: true
+>   - Git operations protocol: ssh
+>   - Token: gho_************************************
+
+*[thinking block — content not retained in session log]*
+
+Already authed as `othercriteria` via SSH. Let me update the README, add `gh` to the flake, then create+push.
+
+**→ Write:** `/home/dlk/workspace/redshift/README.md`
+
+> *tool result*
+>
+> The file /home/dlk/workspace/redshift/README.md has been updated successfully.
+
+**→ TaskCreate:** Add gh to flake.nix
+
+> *tool result*
+>
+> Task #26 created successfully: Add gh to flake.nix
+
+**→ TaskCreate:** Create+push public repo
+
+> *tool result*
+>
+> Task #27 created successfully: Create+push public repo
+
+**→ TaskUpdate:** id=26 → in_progress
+
+> *tool result*
+>
+> Updated task #26 status
+
+**→ Edit:** `/home/dlk/workspace/redshift/flake.nix`
+
+> *tool result*
+>
+> The file /home/dlk/workspace/redshift/flake.nix has been updated successfully.
+
+**→ TaskUpdate:** id=26 → completed
+
+> *tool result*
+>
+> Updated task #26 status
+
+**→ Bash:** `git add -A && git commit -m "$(cat <<'EOF'`
+
+> *tool result*
+>
+> [main f4ea6aa] README rewrite + add gh to flake (for the public-repo push)
+>  2 files changed, 63 insertions(+), 27 deletions(-)
+> f4ea6aa README rewrite + add gh to flake (for the public-repo push)
+> 80f5e34 Deliverable: doc/redshift.md, rendered PDF, session transcript
+> d6b364e Ablation rig: four sibling models + cross-model comparison figures
+
+*[thinking block — content not retained in session log]*
+
+**→ TaskUpdate:** id=27 → in_progress
+
+> *tool result*
+>
+> Updated task #27 status
+
+**→ Bash:** `nix run nixpkgs#gh -- repo create othercriteria/redshift \`
+
+> *tool result*
+>
+> The user doesn't want to proceed with this tool use. The tool use was rejected (eg. if it was a file edit, the new_string was NOT written to the file). To tell you how to proceed, the user said:
+> restarting Claude Code...
+
+*[thinking block — content not retained in session log]*
+
+Standing down on the push. Where we are at the restart point:
+
+- Local repo at `f4ea6aa` on `main`. All commits clean, sweep done.
+- Authorship + transcript + LLM disclosure already in `doc/redshift.md` and `README.md`.
+- Flake now includes `gh` and `git-lfs`, so after `direnv allow`/reload they'll be in PATH natively.
+- The exact command for after the restart is:
+
+```bash
+gh repo create othercriteria/redshift \
+  --public --source=. --remote=origin --push \
+  --description "Toy generative + Bayesian-inference exploration of whether Doppler and cosmological redshifts can be statistically separated."
+```
+
+Will pick up wherever you'd like when you're back.
+
+---
+
+## User
+
+Should have `gh` now.
+
+---
+
+## Claude
+
+*[thinking block — content not retained in session log]*
+
+**→ Bash:** `which gh && gh --version | head -1 && gh auth status 2>&1 | head -5`
+
+> *tool result*
+>
+> /nix/store/y3m73nv1ry783kqfjqq17p3kxxaxx5d1-gh-2.92.0/bin/gh
+> gh version 2.92.0 (nixpkgs)
+> github.com
+>   ✓ Logged in to github.com account othercriteria (/home/dlk/.config/gh/hosts.yml)
+>   - Active account: true
+>   - Git operations protocol: ssh
+>   - Token: gho_************************************
+
+**→ Bash:** `gh repo create othercriteria/redshift \`
+
+> *tool result*
+>
+> https://github.com/othercriteria/redshift
+> Uploading LFS objects: 100% (6/6), 1.6 MB | 0 B/s, done.
+> To github.com:othercriteria/redshift.git
+>  * [new branch]      HEAD -> main
+> branch 'main' set up to track 'origin/main'.
+
+**→ TaskUpdate:** id=27 → completed
+
+> *tool result*
+>
+> Updated task #27 status
+
+**→ Bash:** `gh repo view othercriteria/redshift --json url,visibility,description,sshUrl 2>&1`
+
+> *tool result*
+>
+> {"description":"Toy generative + Bayesian-inference exploration of whether Doppler and cosmological redshifts can be statistically separated.","sshUrl":"git@github.com:othercriteria/redshift.git","url":"https://github.com/othercriteria/redshift","visibility":"PUBLIC"}
+
+Pushed. Live at <https://github.com/othercriteria/redshift> — public, all 7 commits, all 6 LFS objects (~1.6 MB) uploaded successfully, `main` tracking `origin/main`.
+
+---
+
+## User
+
+Notes from reading/skimming report:
+- probably should do a prose style pass: "Two physically distinct effects redshift light from distant galaxies: the [...]" garden-paths pretty badly
+- "How this document was made" belongs as appendix; it's a bit jarring to pivot away from the concrete topic there, and the author_s_ is a strong enough early indicator of the collaboration, and so I think we can keep the "flag this prominently" even in the new location
+- "received at wavelength": can we use "observed" or "measured" or "imaged" here?
+- "the spectroscopic signature is identical": more concretely, what aspects are invariant, what aspects are affected?
+- "Combining them properly gives the multiplicative form": what's the intuition/basis for this?
+- "Ablation chain" section needs a bit more motivation/pay-off; perhaps we restate the minimal model / assumptions we land on there, which is a bit redundant but avoids jumping back to section 2?
+
+It's already basically coherent and readable in its current form.
+
+---
+
+## User
+
+Notes from reading/skimming report:
+- probably should do a prose style pass: "Two physically distinct effects redshift light from distant galaxies: the [...]" garden-paths pretty badly
+- "How this document was made" belongs as appendix; it's a bit jarring to pivot away from the concrete topic there, and the author_s_ is a strong enough early indicator of the collaboration, and so I think we can keep the "flag this prominently" even in the new location
+- "received at wavelength": can we use "observed" or "measured" or "imaged" here?
+- "the spectroscopic signature is identical": more concretely, what aspects are invariant, what aspects are affected?
+- "Combining them properly gives the multiplicative form": what's the intuition/basis for this?
+- "Ablation chain" section needs a bit more motivation/pay-off; perhaps we restate the minimal model / assumptions we land on there, which is a bit redundant but avoids jumping back to section 2?
+
+It's already basically coherent and readable in its current form.
+
+Oh, and at the cost/risk of re-running a lot of code, would we be meaningfully happier at galaxies N=50? N=200? N=2000? How many obervations are available in classic surveys that roughly align with our defaults?
+
+---
+
+## Claude
+
+*[thinking block — content not retained in session log]*
+
+Good notes. Working order:
+
+1. Prose pass + structural moves (fast, doesn't depend on new data).
+2. Kick off the N-comparison runs.
+3. Look at results, decide whether to inline a brief note or push to appendix.
+4. Re-render, refresh transcript, commit, push.
+
+For the N question up front: the answer needs a quick experiment, but I can ground the survey scale now — for low-redshift Type Ia compilations, **a few hundred** is realistic (Carnegie Supernova Project ~130 low-z, Pantheon+ ~few hundred at z<0.1, Joint Light-curve Analysis ~740 total with maybe ~200 low-z). N=500 is honest. N=2000 is at the optimistic edge of what'll exist after LSST starts producing.
+
+Starting prose work now and kicking off N runs in parallel.
+
+**→ Bash:** `for n in 50 200 2000; do`
+
+**→ Read:** `/home/dlk/workspace/redshift/doc/redshift.md`
+
+> *tool result*
+>
+> wrote 50 galaxies to build/catalog_n50.json (max z_obs = 0.0930)
+> wrote 200 galaxies to build/catalog_n200.json (max z_obs = 0.0943)
+> wrote 2000 galaxies to build/catalog_n2000.json (max z_obs = 0.0957)
+
+> *tool result*
+>
+> 1	---
+> 2	title: "Untangling Doppler and Cosmological Redshift"
+> 3	subtitle: "A toy identifiability demonstration"
+> 4	author:
+> 5	  - Daniel Klein
+> 6	  - Claude Opus 4.7 (Anthropic), via Claude Code
+> 7	date: "2026-05-04"
+> 8	geometry: "margin=1in"
+> 9	fontsize: 11pt
+> 10	monofont: "DejaVu Sans Mono"
+> 11	header-includes:
+> 12	  - \usepackage{microtype}
+> 13	---
+> 14	
+> 15	## TL;DR
+> 16	
+> 17	Two physically distinct effects redshift light from distant galaxies:
+> 18	the galaxy's own motion through space (Doppler), and the expansion of
+> 19	space itself (cosmological). For a single galaxy, an observation
+> 20	cannot tell them apart. With many galaxies *and* an independent
+> 21	distance estimate per galaxy, a hierarchical Bayesian fit recovers
+> 22	both effects jointly. We demonstrate this on synthetic data, ablate
+> 23	the model down to its leanest viable form, find one tempting
+> 24	simplification that quietly biases $H_0$ by 4%, and end with the case
+> 25	where the distance proxy is removed — to see what the underlying
+> 26	degeneracy actually looks like.
+> 27	
+> 28	## How this document was made
+> 29	
+> 30	This document and its accompanying code were produced collaboratively
+> 31	by Daniel Klein and Claude Opus 4.7 (Anthropic's coding model),
+> 32	working together via the Claude Code CLI over several conversational
+> 33	sessions. The division of labor:
+> 34	
+> 35	- **Human author**: project framing and scope, methodology
+> 36	  ("complete-then-ablate"), tooling decisions (Stan + Python +
+> 37	  Pandoc), prioritization and redirection, visual review of every
+> 38	  figure, sign-off on substantive interpretation.
+> 39	- **Language model**: astronomical domain knowledge, drafting of all
+> 40	  code (generative model, Stan models, fitting and figure scripts),
+> 41	  drafting of this prose, mathematical derivations (e.g. the redshift
+> 42	  Jacobian), MCMC reparameterization attempts and their explanation.
+> 43	
+> 44	The git history is a faithful record of the collaboration: every
+> 45	commit lists Claude as co-author, and the conversational decisions
+> 46	that produced each commit are reflected in the commit messages. A
+> 47	verbatim transcript of every chat turn — including tool calls and
+> 48	their outputs — is checked in at `doc/transcript.md`, with content
+> 49	fetched from third parties (Stan documentation, blog excerpts)
+> 50	redacted out of copyright caution but URLs preserved so any reader
+> 51	can re-fetch. Substantive errors, scope decisions, and the framing
+> 52	of the identifiability claim itself are the human author's
+> 53	responsibility; implementation details and astronomical context are
+> 54	where the model contributed most.
+> 55	
+> 56	We flag this prominently because the work is recognizably the kind of
+> 57	short scientific writeup that, until recently, would have taken a
+> 58	domain expert several days. With current models it took a non-expert
+> 59	human roughly a working day spread across several sessions, with the
+> 60	human's main labor being decisions about what to investigate and what
+> 61	to trust. Readers should weigh the result accordingly.
+> 62	
+> 63	## 1 The question
+> 64	
+> 65	A spectral line emitted at wavelength $\lambda_0$ and received at
+> 66	wavelength $\lambda$ has redshift $z = (\lambda - \lambda_0)/\lambda_0$.
+> 67	Two physical mechanisms can make $z > 0$:
+> 68	
+> 69	- **Doppler.** The galaxy moves *through* space at some line-of-sight
+> 70	  velocity $v$. For non-relativistic motion, the redshift contribution
+> 71	  is $z_\text{pec} \approx v/c$.
+> 72	- **Cosmological.** The metric of space itself expanded between
+> 73	  emission and observation. At low redshift,
+> 74	  $z_\text{cos} \approx H_0 \, d / c$, where $d$ is the proper distance
+> 75	  to the galaxy and $H_0$ is the Hubble constant.
+> 76	
+> 77	Both stretch wavelengths uniformly, so the spectroscopic signature is
+> 78	identical. Combining them properly gives the multiplicative form
+> 79	
+> 80	$$
+> 81	1 + z_\text{obs} \;=\; (1 + z_\text{cos})\,(1 + z_\text{pec}).
+> 82	$$
+> 83	
+> 84	For one galaxy this is a single equation in two unknowns ($d$ and
+> 85	$v$). It is impossible to tell "far galaxy i
+>
+> [… 702 more chars truncated …]
+
+*[thinking block — content not retained in session log]*
+
+Catalogs generated. Kicking off three fits in parallel (background).
+
+**→ Bash:** `python src/fit.py --catalog build/catalog_n50.json --tag complete_n50 --seed 1 > /tmp/fit_n50.log 2>&1`
+
+**→ Bash:** `python src/fit.py --catalog build/catalog_n200.json --tag complete_n200 --seed 1 > /tmp/fit_n200.log 2>&1`
+
+**→ Bash:** `python src/fit.py --catalog build/catalog_n2000.json --tag complete_n2000 --seed 1 > /tmp/fit_n2000.log 2>&1`
+
+> *tool result*
+>
+> Command running in background with ID: bino3v24j. Output is being written to: /tmp/nix-shell.EIjEBj/claude-1000/-home-dlk-workspace-redshift/a25ea3db-509d-4c85-9e79-cf2646391f97/tasks/bino3v24j.output
+
+> *tool result*
+>
+> Command running in background with ID: bh6yzhf3t. Output is being written to: /tmp/nix-shell.EIjEBj/claude-1000/-home-dlk-workspace-redshift/a25ea3db-509d-4c85-9e79-cf2646391f97/tasks/bh6yzhf3t.output
+
+> *tool result*
+>
+> Command running in background with ID: b639wsv2i. Output is being written to: /tmp/nix-shell.EIjEBj/claude-1000/-home-dlk-workspace-redshift/a25ea3db-509d-4c85-9e79-cf2646391f97/tasks/b639wsv2i.output
+
+*[thinking block — content not retained in session log]*
+
+**→ Bash:** `tail -20 /tmp/fit_n50.log`
+
+> *tool result*
+>
+> Traceback (most recent call last):
+>   File "/home/dlk/workspace/redshift/src/fit.py", line 86, in <module>
+>     main()
+>     ~~~~^^
+>   File "/home/dlk/workspace/redshift/src/fit.py", line 53, in main
+>     model = CmdStanModel(stan_file=model_file)
+>   File "/nix/store/67wrm424325006vxmxrkgxhs16r7nign-python3-3.14.3-env/lib/python3.14/site-packages/cmdstanpy/model.py", line 189, in __init__
+>     raise ValueError('no such file {}'.format(self._stan_file))
+> ValueError: no such file /home/dlk/workspace/redshift/src/models/complete_n50.stan
+
+*[thinking block — content not retained in session log]*
+
+Right — fit.py derives model path from tag. Need to override with `--model`. Re-firing.
+
+**→ Bash:** `python src/fit.py --catalog build/catalog_n50.json --model src/models/complete.stan --tag complete_n50 --seed 1 > /tmp/fit_n50.log 2>&1`
+
+**→ Bash:** `python src/fit.py --catalog build/catalog_n200.json --model src/models/complete.stan --tag complete_n200 --seed 1 > /tmp/fit_n200.log 2>&1`
+
+**→ Bash:** `python src/fit.py --catalog build/catalog_n2000.json --model src/models/complete.stan --tag complete_n2000 --seed 1 > /tmp/fit_n2000.log 2>&1`
+
+> *tool result*
+>
+> Command running in background with ID: bm5f17g8q. Output is being written to: /tmp/nix-shell.EIjEBj/claude-1000/-home-dlk-workspace-redshift/a25ea3db-509d-4c85-9e79-cf2646391f97/tasks/bm5f17g8q.output
+
+**→ TaskCreate:** Prose pass on doc/redshift.md
+
+> *tool result*
+>
+> Command running in background with ID: bfrvxmwd0. Output is being written to: /tmp/nix-shell.EIjEBj/claude-1000/-home-dlk-workspace-redshift/a25ea3db-509d-4c85-9e79-cf2646391f97/tasks/bfrvxmwd0.output
+
+> *tool result*
+>
+> Command running in background with ID: bej51yp9y. Output is being written to: /tmp/nix-shell.EIjEBj/claude-1000/-home-dlk-workspace-redshift/a25ea3db-509d-4c85-9e79-cf2646391f97/tasks/bej51yp9y.output
+
+> *tool result*
+>
+> Task #28 created successfully: Prose pass on doc/redshift.md
+
+**→ TaskCreate:** N-scaling note in deliverable
+
+**→ TaskUpdate:** id=28 → in_progress
+
+> *tool result*
+>
+> Task #29 created successfully: N-scaling note in deliverable
+
+> *tool result*
+>
+> Updated task #28 status
+
+Now the prose work while fits run.
+
+**→ Edit:** `/home/dlk/workspace/redshift/doc/redshift.md`
+
+> *tool result*
+>
+> The file /home/dlk/workspace/redshift/doc/redshift.md has been updated successfully.
+
+*[thinking block — content not retained in session log]*
+
+**→ Read:** `/home/dlk/workspace/redshift/doc/redshift.md`
+
+> *tool result*
+>
+> 160	sampling draws each, `adapt_delta = 0.95`. A short refresher on
+> 161	diagnostics is in Appendix A.
+> 162	
+> 163	## 4 Recovery on the complete model
+> 164	
+> 165	![Hubble diagram. Black: synthetic galaxies. Red: posterior median fit. Blue dashed: the truth. Lower panel: residuals. The 90% band on $H_0$ is invisibly thin at this scale.](figures/complete/hubble.png){width=85%}
+> 166	
+> 167	![Joint posterior on $(H_0, \sigma_v, \sigma_\text{obs})$. Dashed red marks the truth on each marginal; red ×s mark truth in the 2-D panels.](figures/complete/posterior.png){width=70%}
+> 168	
+> 169	Posterior summaries (median; 5th and 95th percentiles in brackets;
+> 170	truth in parentheses):
+> 171	
+> 172	| parameter | recovered | truth |
+> 173	|---|---|---|
+> 174	| $H_0$ [km/s/Mpc] | $70.04\;[69.80,\,70.27]$ | $70.0$ |
+> 175	| $\sigma_v$ [km/s] | $324\;[231,\,450]$ | $300$ |
+> 176	| $\sigma_\text{obs}$ [mag] | $0.113\;[0.105,\,0.122]$ | $0.112$ |
+> 177	
+> 178	The Hubble diagram is what the eye expects: galaxies on a curve, with
+> 179	visible scatter that has two sources (peculiar velocity and candle
+> 180	noise), both apparent in the residuals.
+> 181	
+> 182	A subtle but real feature is visible in the corner plot: $\sigma_v$
+> 183	and $\sigma_\text{obs}$ are mildly anti-correlated. They share a
+> 184	budget of "scatter not explained by the Hubble line". $\sigma_v$
+> 185	spreads $z_\text{obs}$, while $\sigma_\text{obs}$ spreads
+> 186	$\mu_\text{obs}$, but both translate through the model into
+> 187	unexplained variance around the fit. The data apportions the variance
+> 188	jointly; it cannot perfectly separate the two sources.
+> 189	
+> 190	Diagnostics: no divergent transitions, $\hat{R} \le 1.07$ on the
+> 191	worst parameter ($\sigma_v$), bulk effective sample size $\ge 100$ on
+> 192	all of $(H_0, \sigma_v, \sigma_\text{obs})$, but a low E-BFMI
+> 193	($\approx 0.07$) — the canonical signature of a centered
+> 194	hierarchical funnel between $\sigma_v$ and the latent $\{d_i\}$.
+> 195	Discussed further in Appendix A. Posterior coverage of truth is
+> 196	correct.
+> 197	
+> 198	## 5 Ablation chain
+> 199	
+> 200	Methodology: build the model rich, then simplify one knob at a time.
+> 201	Keep a simplification only if the posterior on $(H_0, \sigma_v)$ still
+> 202	covers the truth and the credible-interval widths don't change
+> 203	qualitatively. A failed safety check pinpoints which feature of the
+> 204	physical model the data actually leans on.
+> 205	
+> 206	We try three simplifications, in order:
+> 207	
+> 208	1. **Multiplicative → additive redshift.** Replace
+> 209	   $1 + z_\text{obs} = (1 + z_\text{cos})(1 + z_\text{pec})$ with the
+> 210	   linear $z_\text{obs} \approx z_\text{cos} + z_\text{pec}$. The
+> 211	   dropped cross term $z_\text{cos} z_\text{pec}$ is at most
+> 212	   $\sim 10^{-4}$ at our redshifts. The Jacobian becomes a constant
+> 213	   and falls out. Posterior:
+> 214	   $H_0 = 70.04\,[69.81,\,70.27]$,
+> 215	   $\sigma_v = 339\,[247,\,467]$. **Safe.**
+> 216	
+> 217	2. **Drop the $q_0$ correction** ($d_L = d$). Looks small at $z=0.1$
+> 218	   — the correction is only $\sim 8\%$. Defer to Section 6.
+> 219	
+> 220	3. **Treat $\sigma_\text{obs}$ as known.** Justified when intrinsic
+> 221	   candle scatter and measurement noise have been calibrated
+> 222	   externally. Posterior on $H_0$ and $\sigma_v$:
+> 223	   $H_0 = 70.04\,[69.79,\,70.30]$,
+> 224	   $\sigma_v = 354\,[284,\,447]$. **Safe**, with $\sigma_v$ shifting
+> 225	   slightly upward as expected — variance that was being absorbed by
+> 226	   $\sigma_\text{obs}$ now goes into $\sigma_v$.
+> 227	
+> 228	![Marginal posteriors on $H_0$ (left) and $\sigma_v$ (right) across the safe ablation chain. The three safe configurations are essentially indistinguishable on $H_0$. The orange "no $\mu$" curve is Section 7.](figures/compare/marginals_safe.png){width=100%}
+> 229	
+> 230	The three safe configurations sit on top of each other on $H_0$,
+> 231	peaked at the truth. On $\sigma_v$, fixing $\sigma_\text{obs}$ shifts
+> 232	the marginal a little to higher values, as just discussed. The orange
+> 233	no-$\mu$ curve is the punchline of Section 
+>
+> [… 246 more chars truncated …]
+
+**→ Edit:** `/home/dlk/workspace/redshift/doc/redshift.md`
+
+> *tool result*
+>
+> The file /home/dlk/workspace/redshift/doc/redshift.md has been updated successfully.
+
+*[thinking block — content not retained in session log]*
+
+**→ Bash:** `grep -n "^## " doc/redshift.md && wc -l doc/redshift.md`
+
+> *tool result*
+>
+> 15:## TL;DR
+> 28:## 1 The question
+> 74:## 2 The generative model
+> 124:## 3 The inference task
+> 163:## 4 Recovery on the complete model
+> 198:## 5 Ablation chain
+> 245:## 6 Counter-example: the $q_0$ pitfall
+> 282:## 7 The punchline: no $\mu$
+> 329:## 8 Caveats
+> 357:## Appendix A — MCMC diagnostics, briefly
+> 398:## Appendix B — Estimation methods we didn't use
+> 435:## Appendix C — Reproducing this
+> 469 doc/redshift.md
+
+**→ Read:** `/home/dlk/workspace/redshift/doc/redshift.md`
+
+> *tool result*
+>
+> 435	## Appendix C — Reproducing this
+> 436	
+> 437	Repository layout:
+> 438	
+> 439	```
+> 440	src/
+> 441	  generate.py          synthetic catalog
+> 442	  fit.py               Stan fitting wrapper
+> 443	  figures.py           per-fit figures
+> 444	  compare.py           cross-fit figures
+> 445	  models/
+> 446	    complete.stan      multiplicative + q0 + fitted σ_obs
+> 447	    additive.stan      drop multiplicative
+> 448	    no_q0.stan         counter-example: drop q0 correction
+> 449	    fixed_obs.stan     additive + σ_obs as data
+> 450	    no_mu.stan         drop μ likelihood (degeneracy demo)
+> 451	build/                 ephemeral output (Stan chains, summaries)
+> 452	doc/                   this document and committed figures
+> 453	```
+> 454	
+> 455	Pipeline (recipes in `justfile`, run from repo root):
+> 456	
+> 457	```bash
+> 458	just generate           # write build/catalog.json
+> 459	python src/fit.py --tag complete    # or additive, no_q0, ...
+> 460	python src/figures.py --tag complete
+> 461	python src/compare.py
+> 462	just pdf                # render this document
+> 463	```
+> 464	
+> 465	Default settings are listed in Section 2. All fits in this document
+> 466	use seed 1 and $N = 500$. The full toolchain (Python 3.14, CmdStan,
+> 467	Pandoc, TeXLive) is pinned via `flake.nix`; entering the development
+> 468	environment via `direnv allow` (or `nix develop`) gives a
+> 469	deterministic shell.
+
+**→ Edit:** `/home/dlk/workspace/redshift/doc/redshift.md`
+
+> *tool result*
+>
+> The file /home/dlk/workspace/redshift/doc/redshift.md has been updated successfully.
+
+Now let me check the N runs and decide on the N-scaling note.
+
+**→ Bash:** `echo "=== N=50 ===" && grep -E "^(H0|sigma_)" /tmp/fit_n50.log`
+
+> *tool result*
+>
+> === N=50 ===
+> H0          70.104500    0.402950  69.459400  ...   70.788100  1.00566  1683.070
+> sigma_v    378.150000  201.084000  85.921900  ...  736.897000  1.02596   179.770
+> sigma_obs    0.096123    0.018232   0.063206  ...    0.123691  1.01344   510.057
+> === N=200 ===
+> H0          69.770500    0.234975   69.39030  ...   70.151300  1.00574  1113.370
+> sigma_v    405.998000  105.648000  250.47500  ...  600.008000  1.01911   204.134
+> sigma_obs    0.110264    0.009251    0.09422  ...    0.124563  1.00910   482.802
+> === N=500 (existing summary) ===
+>                  Mean     StdDev          5%         95%
+> H0          70.034600   0.143886   69.797000   70.265900
+> sigma_v    331.738000  66.942800  230.859000  450.176000
+> sigma_obs    0.113423   0.005206    0.104712    0.121696
+> === N=2000 status ===
+> 	Exception: normal_lpdf: Location parameter[1] is inf, but must be finite! (in 'complete.stan', line 64, column 2 to column 38)
+> 	Exception: normal_lpdf: Location parameter[1] is inf, but must be finite! (in 'complete.stan', line 64, column 2 to column 38)
+> Consider re-running with show_console=True if the above output is unclear!
+
+*[thinking block — content not retained in session log]*
+
+**→ Bash:** `ps aux | grep "src/fit.py" | grep -v grep | head -3`
+
+> *tool result*
+>
+> dlk      1134085  0.0  0.0   9540  4692 ?        Ss   16:15   0:00 /run/current-system/sw/bin/zsh -c source /home/dlk/.claude/shell-snapshots/snapshot-zsh-1777923447075-hbuvux.sh 2>/dev/null || true && setopt NO_EXTENDED_GLOB 2>/dev/null || true && eval 'python src/fit.py --catalog build/catalog_n2000.json --model src/models/complete.stan --tag complete_n2000 --seed 1 > /tmp/fit_n2000.log 2>&1' < /dev/null && pwd -P >| /tmp/nix-shell.EIjEBj/claude-2342-cwd
+> dlk      1134087  2.3  0.0 7141428 85992 ?       S    16:15   0:05 /nix/store/67wrm424325006vxmxrkgxhs16r7nign-python3-3.14.3-env/bin/python src/fit.py --catalog build/catalog_n2000.json --model src/models/complete.stan --tag complete_n2000 --seed 1
+> ---
+> -rw-r--r--  1 dlk users 104105274 May  4 16:17 complete-20260504161545_4.csv
+> -rw-r--r--  1 dlk users 104108266 May  4 16:17 complete-20260504161545_5.csv
+> -rw-r--r--  1 dlk users 104105747 May  4 16:16 complete-20260504161545_6.csv
+> -rw-r--r--  1 dlk users 104106156 May  4 16:16 complete-20260504161545_7.csv
+> -rw-r--r--  1 dlk users 104104801 May  4 16:17 complete-20260504161545_8.csv
+
+*[thinking block — content not retained in session log]*
+
+**→ Bash:** `until ! pgrep -f "complete_n2000" > /dev/null; do sleep 10; done; echo "N=2000 fit finished"; tail -5 /tmp/fit_n2000.log`
+
+> *tool result*
+>
+> Command running in background with ID: b7qdpzbfn. Output is being written to: /tmp/nix-shell.EIjEBj/claude-1000/-home-dlk-workspace-redshift/a25ea3db-509d-4c85-9e79-cf2646391f97/tasks/b7qdpzbfn.output
+
+**→ Bash:** `grep -E "^(H0|sigma_)" /tmp/fit_n2000.log`
+
+> *tool result*
+>
+> H0          70.013000   0.067540   69.904400  ...   70.121900  1.00658   879.223
+> sigma_v    284.353000  26.563700  242.081000  ...  329.710000  1.04315   167.093
+> sigma_obs    0.112252   0.002242    0.108536  ...    0.115935  1.00737   780.521
+
+*[thinking block — content not retained in session log]*
+
+All four N values in:
+
+| N | H₀ 90% CI | σ_v 90% CI | σ_obs 90% CI |
+|---|---|---|---|
+| 50 | [69.5, 70.8] | [86, 737] | [0.063, 0.124] |
+| 200 | [69.4, 70.2] | [250, 600] | [0.094, 0.125] |
+| 500 | [69.8, 70.3] | [231, 450] | [0.105, 0.122] |
+| 2000 | [69.9, 70.1] | [242, 330] | [0.109, 0.116] |
+
+CI widths scale as 1/√N as expected. At N=50, σ_v's 90% interval spans almost an order of magnitude — the inference is barely informative. At N=2000, σ_v is properly pinned. Worth a sub-section with the table, no separate figure needed.
+
+**→ Edit:** `/home/dlk/workspace/redshift/doc/redshift.md`
+
+> *tool result*
+>
+> The file /home/dlk/workspace/redshift/doc/redshift.md has been updated successfully.
+
+*[thinking block — content not retained in session log]*
+
+Re-rendering PDF and cleaning up the heavy N=2000 CSVs.
+
+**→ Bash:** `just pdf 2>&1 | tail -3 && ls -la doc/redshift.pdf && du -sh build/fits/complete_n2000/ 2>/dev/null`
+
+> *tool result*
+>
+> pandoc doc/redshift.md -o doc/redshift.pdf --pdf-engine=xelatex --resource-path=doc
+> -rw-r--r-- 1 dlk users 830008 May  4 16:26 doc/redshift.pdf
+> 607M	build/fits/complete_n2000/
+
+**→ Bash:** `rm -rf build/fits/complete_n50 build/fits/complete_n200 build/fits/complete_n2000 build/catalog_n50.json build/catalog_n200.json build/catalog_n2000.json build/summaries/complete_n50.* build/summaries/complete_n200.* build/summaries/complet`
+
+> *tool result*
+>
+> 691M	build/
+
+*[thinking block — content not retained in session log]*
+
+**→ Bash:** `du -sh build/* 2>/dev/null | sort -h`
+
+> *tool result*
+>
+> 33K	build/catalog.json
+> 886K	build/summaries
+> 690M	build/fits
+
+**→ Bash:** `du -sh build/fits/*`
+
+> *tool result*
+>
+> 156M	build/fits/additive
+> 156M	build/fits/complete
+> 156M	build/fits/fixed_obs
+> 97M	build/fits/no_mu
+> 127M	build/fits/no_q0
