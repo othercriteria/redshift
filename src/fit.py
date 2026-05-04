@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 from pathlib import Path
 
 from cmdstanpy import CmdStanModel
@@ -41,7 +42,9 @@ def main() -> None:
     }
 
     out_dir = Path("build/fits") / args.tag
-    out_dir.mkdir(parents=True, exist_ok=True)
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
+    out_dir.mkdir(parents=True)
 
     model = CmdStanModel(stan_file=args.model)
     fit = model.sample(
@@ -57,7 +60,11 @@ def main() -> None:
     fit.save_csvfiles(str(out_dir))
 
     summary = fit.summary()
-    summary.to_csv(out_dir / "summary.csv")
+    # Stash the summary outside the cmdstan-CSV dir so cmdstanpy.from_csv
+    # doesn't mistake it for chain output.
+    summary_dir = Path("build/summaries")
+    summary_dir.mkdir(parents=True, exist_ok=True)
+    summary.to_csv(summary_dir / f"{args.tag}.csv")
 
     key = summary.loc[KEY_PARAMS, SUMMARY_COLS]
     print(key)
@@ -67,7 +74,7 @@ def main() -> None:
     )
 
     diagnose = fit.diagnose()
-    (out_dir / "diagnose.txt").write_text(diagnose)
+    (summary_dir / f"{args.tag}.diagnose.txt").write_text(diagnose)
 
 
 if __name__ == "__main__":
