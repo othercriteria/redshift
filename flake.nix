@@ -12,13 +12,12 @@
       system:
       let
         pkgs = import nixpkgs { inherit system; };
-        python = pkgs.python312.withPackages (ps: with ps; [
+        python = pkgs.python314.withPackages (ps: with ps; [
           numpy
           scipy
           matplotlib
           pandas
           cmdstanpy
-          arviz
         ]);
         tex = pkgs.texlive.combine {
           inherit (pkgs.texlive)
