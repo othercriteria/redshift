@@ -13,12 +13,29 @@ fit:
 figures:
     python src/figures.py
 
-# Build the deliverable PDF via Pandoc.
+# Build the deliverable PDF via Pandoc. xelatex (rather than pdflatex)
+# so unicode in code blocks doesn't blow up; --resource-path so figure
+# references in the markdown resolve relative to doc/.
 pdf:
-    pandoc doc/redshift.md -o doc/redshift.pdf
+    pandoc doc/redshift.md -o doc/redshift.pdf \
+        --pdf-engine=xelatex \
+        --resource-path=doc
 
 # Full pipeline.
 all: generate fit figures pdf
+
+# Re-extract the chat transcript from the local Claude Code session log.
+# Picks the largest .jsonl in this project's session dir.
+transcript:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    session_dir="$HOME/.claude/projects/-home-dlk-workspace-redshift"
+    latest=$(ls -S "$session_dir"/*.jsonl 2>/dev/null | head -1)
+    if [ -z "$latest" ]; then
+        echo "no session log found in $session_dir" >&2
+        exit 1
+    fi
+    python scripts/extract_transcript.py --session "$latest"
 
 # Drop generated outputs.
 clean:
