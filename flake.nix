@@ -32,6 +32,7 @@
             pkgs.cmdstan
             pkgs.pandoc
             pkgs.just
+            pkgs.git-lfs
             tex
           ];
 

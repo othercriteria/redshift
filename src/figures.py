@@ -110,7 +110,7 @@ def main() -> None:
 
     catalog = json.loads(args.catalog.read_text())
     fit_dir = Path("build/fits") / args.tag
-    out_dir = Path("build/figures") / args.tag
+    out_dir = Path("doc/figures") / args.tag
     out_dir.mkdir(parents=True, exist_ok=True)
 
     fit = from_csv(str(fit_dir))

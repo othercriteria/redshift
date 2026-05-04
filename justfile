@@ -15,7 +15,7 @@ figures:
 
 # Build the deliverable PDF via Pandoc.
 pdf:
-    pandoc doc/redshift.md -o build/redshift.pdf
+    pandoc doc/redshift.md -o doc/redshift.pdf
 
 # Full pipeline.
 all: generate fit figures pdf
